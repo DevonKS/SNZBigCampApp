@@ -1,7 +1,7 @@
 package com.example.devon.snzbigcamp;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,10 +18,10 @@ import weekview.WeekViewEvent;
 
 public class CalendarView extends AppCompatActivity {
 
-    private WeekView mWeekView;
     private static final int TYPE_DAY_VIEW = 1;
     private static final int TYPE_THREE_DAY_VIEW = 2;
     private static final int TYPE_WEEK_VIEW = 3;
+    private WeekView mWeekView;
     private int mWeekViewType = TYPE_THREE_DAY_VIEW;
 
     @Override
@@ -42,7 +42,7 @@ public class CalendarView extends AppCompatActivity {
             @Override
             public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
                 List<WeekViewEvent> events = new ArrayList<>();
-                WeekViewEvent event = new WeekViewEvent(1, "stuff", newYear, newMonth, 26, 9, 0, newYear, newMonth, 26, 10, 0);
+                WeekViewEvent event = new WeekViewEvent(1, "stuff", newYear, newMonth, 26, 10, 0, newYear, newMonth, 26, 11, 0);
                 event.setColor(getResources().getColor(R.color.event_color_03));
                 events.add(event);
                 System.out.println(newYear);
