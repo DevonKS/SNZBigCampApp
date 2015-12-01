@@ -12,40 +12,39 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import weekview.DateTimeInterpreter;
-import weekview.WeekView;
-import weekview.WeekViewEvent;
+import calendarview.CalendarEvent;
+import calendarview.CalendarView;
+import calendarview.DateTimeInterpreter;
 
-public class CalendarView extends AppCompatActivity {
+public class CalendarActivity extends AppCompatActivity {
 
     private static final int TYPE_DAY_VIEW = 1;
     private static final int TYPE_THREE_DAY_VIEW = 2;
     private static final int TYPE_WEEK_VIEW = 3;
-    private WeekView mWeekView;
+    private CalendarView mCalendarView;
     private int mWeekViewType = TYPE_THREE_DAY_VIEW;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_calendar_view);
+        setContentView(R.layout.activity_calendar);
 
         // Get a reference for the week view in the layout.
-        mWeekView = (WeekView) findViewById(R.id.weekView);
-        mWeekView.goToHour(9.0);
+        mCalendarView = (CalendarView) findViewById(R.id.calender);
+        mCalendarView.goToHour(9.0);
 
 //        // Set an action when any event is clicked.
 //        mWeekView.setOnEventClickListener(mEventClickListener);
 //
 //        // The week view has infinite scrolling horizontally. We have to provide the events of a
 //        // month every time the month changes on the week view.
-        mWeekView.setMonthChangeListener(new WeekView.MonthChangeListener() {
+        mCalendarView.setMonthChangeListener(new CalendarView.MonthChangeListener() {
             @Override
-            public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
-                List<WeekViewEvent> events = new ArrayList<>();
-                WeekViewEvent event = new WeekViewEvent(1, "stuff", newYear, newMonth, 26, 10, 0, newYear, newMonth, 26, 11, 0);
+            public List<CalendarEvent> onMonthChange(int newYear, int newMonth) {
+                List<CalendarEvent> events = new ArrayList<>();
+                CalendarEvent event = new CalendarEvent(1, "Night Meeting", "Teen Tent", "Speaker: Bob Hope.", newYear, newMonth, 1, 10, 0, newYear, newMonth, 1, 11, 0);
                 event.setColor(getResources().getColor(R.color.event_color_03));
                 events.add(event);
-                System.out.println(newYear);
 
                 return events;
             }
@@ -58,7 +57,7 @@ public class CalendarView extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_calendar_view, menu);
+        getMenuInflater().inflate(R.menu.menu_calendar, menu);
         return true;
     }
 
@@ -68,42 +67,48 @@ public class CalendarView extends AppCompatActivity {
         setupDateTimeInterpreter(id == R.id.action_week_view);
         switch (id){
             case R.id.action_today:
-                mWeekView.goToToday();
+                mCalendarView.goToToday();
                 return true;
             case R.id.action_day_view:
                 if (mWeekViewType != TYPE_DAY_VIEW) {
                     item.setChecked(!item.isChecked());
+                    double hour = mCalendarView.getFirstVisibleHour();
                     mWeekViewType = TYPE_DAY_VIEW;
-                    mWeekView.setNumberOfVisibleDays(1);
+                    mCalendarView.setNumberOfVisibleDays(1);
 
                     // Lets change some dimensions to best fit the view.
-                    mWeekView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
-                    mWeekView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
-                    mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+                    mCalendarView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
+                    mCalendarView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+                    mCalendarView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+                    mCalendarView.goToHour(hour);
                 }
                 return true;
             case R.id.action_three_day_view:
                 if (mWeekViewType != TYPE_THREE_DAY_VIEW) {
                     item.setChecked(!item.isChecked());
+                    double hour = mCalendarView.getFirstVisibleHour();
                     mWeekViewType = TYPE_THREE_DAY_VIEW;
-                    mWeekView.setNumberOfVisibleDays(3);
+                    mCalendarView.setNumberOfVisibleDays(3);
 
                     // Lets change some dimensions to best fit the view.
-                    mWeekView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
-                    mWeekView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
-                    mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+                    mCalendarView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics()));
+                    mCalendarView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+                    mCalendarView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
+                    mCalendarView.goToHour(hour);
                 }
                 return true;
             case R.id.action_week_view:
                 if (mWeekViewType != TYPE_WEEK_VIEW) {
                     item.setChecked(!item.isChecked());
+                    double hour = mCalendarView.getFirstVisibleHour();
                     mWeekViewType = TYPE_WEEK_VIEW;
-                    mWeekView.setNumberOfVisibleDays(7);
+                    mCalendarView.setNumberOfVisibleDays(7);
 
                     // Lets change some dimensions to best fit the view.
-                    mWeekView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics()));
-                    mWeekView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
-                    mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
+                    mCalendarView.setColumnGap((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics()));
+                    mCalendarView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
+                    mCalendarView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
+                    mCalendarView.goToHour(hour);
                 }
                 return true;
         }
@@ -117,12 +122,12 @@ public class CalendarView extends AppCompatActivity {
      * @param shortDate True if the date values should be short.
      */
     private void setupDateTimeInterpreter(final boolean shortDate) {
-        mWeekView.setDateTimeInterpreter(new DateTimeInterpreter() {
+        mCalendarView.setDateTimeInterpreter(new DateTimeInterpreter() {
             @Override
             public String interpretDate(Calendar date) {
                 SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("EEE", Locale.getDefault());
                 String weekday = weekdayNameFormat.format(date.getTime());
-                SimpleDateFormat format = new SimpleDateFormat(" M/d", Locale.getDefault());
+                SimpleDateFormat format = new SimpleDateFormat(" d/M", Locale.getDefault());
 
                 // All android api level do not have a standard way of getting the first letter of
                 // the week day name. Hence we get the first char programmatically.
@@ -134,7 +139,12 @@ public class CalendarView extends AppCompatActivity {
 
             @Override
             public String interpretTime(int hour) {
-                return hour > 11 ? (hour - 12) + " PM" : (hour == 0 ? "12 AM" : hour + " AM");
+                String amPm;
+                if (hour >= 0 && hour < 12) amPm = "AM";
+                else amPm = "PM";
+                if (hour == 0) hour = 12;
+                if (hour > 12) hour -= 12;
+                return String.format("%02d %s", hour, amPm);
             }
         });
     }

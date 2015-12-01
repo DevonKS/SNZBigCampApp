@@ -1,4 +1,4 @@
-package weekview;
+package calendarview;
 
 import java.util.Calendar;
 
@@ -6,14 +6,16 @@ import java.util.Calendar;
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://april-shower.com
  */
-public class WeekViewEvent {
+public class CalendarEvent {
     private long mId;
     private Calendar mStartTime;
     private Calendar mEndTime;
     private String mName;
+    private String mDetail;
+    private String mDescription;
     private int mColor;
 
-    public WeekViewEvent(){
+    public CalendarEvent() {
 
     }
 
@@ -21,6 +23,8 @@ public class WeekViewEvent {
      * Initializes the event for week view.
      * @param id The id of the event.
      * @param name Name of the event.
+     * @param detail Details of the event.
+     * @param description Description of the event.
      * @param startYear Year when the event starts.
      * @param startMonth Month when the event starts.
      * @param startDay Day when the event starts.
@@ -32,7 +36,7 @@ public class WeekViewEvent {
      * @param endHour Hour (in 24-hour format) when the event ends.
      * @param endMinute Minute when the event ends.
      */
-    public WeekViewEvent(long id, String name, int startYear, int startMonth, int startDay, int startHour, int startMinute, int endYear, int endMonth, int endDay, int endHour, int endMinute) {
+    public CalendarEvent(long id, String name, String detail, String description, int startYear, int startMonth, int startDay, int startHour, int startMinute, int endYear, int endMonth, int endDay, int endHour, int endMinute) {
         this.mId = id;
 
         this.mStartTime = Calendar.getInstance();
@@ -50,22 +54,35 @@ public class WeekViewEvent {
         this.mEndTime.set(Calendar.MINUTE, endMinute);
 
         this.mName = name;
+        this.mDetail = detail;
+        this.mDescription = description;
+    }
+
+    public CalendarEvent(long id, String name, int startYear, int startMonth, int startDay, int startHour, int startMinute, int endYear, int endMonth, int endDay, int endHour, int endMinute) {
+        this(id, name, "", "", startYear, startMonth, startDay, startHour, startMinute, endYear, endMonth, endDay, endHour, endMinute);
     }
 
     /**
      * Initializes the event for week view.
      * @param id The id of the event.
      * @param name Name of the event.
+     * @param detail Details of the event.
+     * @param description Description of the event.
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
      */
-    public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime) {
+    public CalendarEvent(long id, String name, String detail, String description, Calendar startTime, Calendar endTime) {
         this.mId = id;
         this.mName = name;
         this.mStartTime = startTime;
         this.mEndTime = endTime;
+        this.mDetail = detail;
+        this.mDescription = description;
     }
 
+    public CalendarEvent(long id, String name, Calendar startTime, Calendar endTime) {
+        this(id, name, "", "", startTime, endTime);
+    }
 
     public Calendar getStartTime() {
         return mStartTime;
@@ -105,5 +122,21 @@ public class WeekViewEvent {
 
     public void setId(long id) {
         this.mId = id;
+    }
+
+    public String getDetail() {
+        return mDetail;
+    }
+
+    public void setDetail(String mDetail) {
+        this.mDetail = mDetail;
+    }
+
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public void setDescription(String mDescription) {
+        this.mDescription = mDescription;
     }
 }

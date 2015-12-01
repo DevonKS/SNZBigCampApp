@@ -1,4 +1,4 @@
-package weekview;
+package calendarview;
 
 import java.util.Calendar;
 
