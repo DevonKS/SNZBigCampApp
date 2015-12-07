@@ -1,20 +1,26 @@
 package com.example.devon.snzbigcamp;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.net.URL;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import calendarview.CalendarEvent;
 import calendarview.CalendarView;
 import calendarview.DateTimeInterpreter;
+import model.Event;
+import model.EventDataSource;
 
 public class CalendarActivity extends AppCompatActivity {
 
@@ -41,12 +47,17 @@ public class CalendarActivity extends AppCompatActivity {
         mCalendarView.setMonthChangeListener(new CalendarView.MonthChangeListener() {
             @Override
             public List<CalendarEvent> onMonthChange(int newYear, int newMonth) {
-                List<CalendarEvent> events = new ArrayList<>();
-                CalendarEvent event = new CalendarEvent(1, "Night Meeting", "Teen Tent", "Speaker: Bob Hope.", newYear, newMonth, 1, 10, 0, newYear, newMonth, 1, 11, 0);
-                event.setColor(getResources().getColor(R.color.event_color_03));
-                events.add(event);
+                List<Event> events = null;
+                try {
+                    events = new GetMonthEventsTask(CalendarActivity.this).execute(newYear, newMonth).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+                List<CalendarEvent> calendarEvents = convertEventsToCalendarEvents(events);
 
-                return events;
+                return calendarEvents;
             }
         });
 //
@@ -68,6 +79,10 @@ public class CalendarActivity extends AppCompatActivity {
         switch (id){
             case R.id.action_today:
                 mCalendarView.goToToday();
+                return true;
+            case R.id.action_refresh:
+                //TODO get events from the cloud then refresh the view
+                new GetEventsTask(this, mCalendarView).execute();
                 return true;
             case R.id.action_day_view:
                 if (mWeekViewType != TYPE_DAY_VIEW) {
@@ -116,6 +131,28 @@ public class CalendarActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private List<CalendarEvent> convertEventsToCalendarEvents(List<Event> events) {
+        List<CalendarEvent> calendarEvents = new ArrayList<CalendarEvent>();
+        if (events == null) return calendarEvents;
+
+        for (Event event : events) {
+            CalendarEvent calendarEvent = convertEventToCalendarEvent(event);
+            calendarEvents.add(calendarEvent);
+        }
+
+        return calendarEvents;
+    }
+
+    private CalendarEvent convertEventToCalendarEvent(Event event) {
+        CalendarEvent calendarEvent = new CalendarEvent(event.getId(), event.getName(),
+                event.getDetail(), event.getDescription(), event.getStartYear(),
+                event.getStartMonth(), event.getStartDay(), event.getStartHour(),
+                event.getStartMinute(), event.getEndYear(), event.getEndMonth(),
+                event.getEndDay(), event.getEndHour(), event.getEndMinute());
+        calendarEvent.setColor(event.getColor());
+        return calendarEvent;
+    }
+
     /**
      * Set up a date time interpreter which will show short date values when in week view and long
      * date values otherwise.
@@ -147,5 +184,67 @@ public class CalendarActivity extends AppCompatActivity {
                 return String.format("%02d %s", hour, amPm);
             }
         });
+    }
+
+    private class GetEventsTask extends AsyncTask<URL, Void, Void> {
+        private final CalendarActivity calendarActivity;
+        private final CalendarView calendarView;
+
+        public GetEventsTask(CalendarActivity calendarActivity, CalendarView calendarView) {
+            this.calendarActivity = calendarActivity;
+            this.calendarView = calendarView;
+        }
+
+        @Override
+        protected Void doInBackground(URL... urls) {
+            EventDataSource eventDataSource = new EventDataSource(calendarActivity);
+            try {
+                eventDataSource.open();
+                eventDataSource.createEvent("Night Meeting", "Teen Tent", "Speaker: Bob Hope.", 2015, 12, 9, 10, 0, 2015, 12, 9, 11, 0, R.color.event_color_03);
+                eventDataSource.createEvent("Bowling", "At the buses", "Buses leave at 1:45pm", 2015, 12, 9, 14, 0, 2015, 12, 9, 17, 0, R.color.event_color_03);
+                eventDataSource.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            calendarView.notifyDatasetChanged();
+        }
+    }
+
+    private class GetMonthEventsTask extends AsyncTask<Integer, Void, List<Event>> {
+        private final CalendarActivity calendarActivity;
+        private List<Event> events;
+
+        public GetMonthEventsTask(CalendarActivity calendarActivity) {
+            this.calendarActivity = calendarActivity;
+        }
+
+        @Override
+        protected List<Event> doInBackground(Integer... integers) {
+            List<Event> events = new ArrayList<Event>();
+            EventDataSource eventDataSource = new EventDataSource(calendarActivity);
+            try {
+                eventDataSource.open();
+                events = eventDataSource.getMonthEvents(integers[0], integers[1]);
+                eventDataSource.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return events;
+        }
+
+        @Override
+        protected void onPostExecute(List<Event> events) {
+            this.events = events;
+        }
+
+        public List<Event> getEvents() {
+            return events;
+        }
     }
 }

@@ -7,4 +7,5 @@
     <string name="action_day_view">Day view</string>
     <string name="action_three_day_view">3 day view</string>
     <string name="action_week_view">Week view</string>
+    <string name="action_refresh">Refresh</string>
 </resources>

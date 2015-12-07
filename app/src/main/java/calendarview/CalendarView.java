@@ -226,6 +226,9 @@ public class CalendarView extends View {
         // Hold references.
         mContext = context;
 
+        // Telling View to Draw again if the view is invalidated
+        setWillNotDraw(false);
+
         // Get the attribute values (if any).
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CalendarView, 0, 0);
         try {
